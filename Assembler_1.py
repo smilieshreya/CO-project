@@ -180,6 +180,38 @@ def instruc_structure(L,t,f):
     if t == 15:
         z = 'ValueError: Value of immediate out of range at line number '+str(i)+'\n'
         return z
+def error_check(x,t):
+    space = 0
+    comma = 0
+    leftbrac = 0
+    rightbrac = 0
+    for i in x:
+        if i == " ":
+            space += 1
+        if i == ",":
+            comma += 1
+        if i == "(":
+            leftbrac += 1
+        if i == ")":
+            rightbrac += 1
+
+    if t == 1 and space!=1 and comma!=2:
+        t = 8
+    if t == 2 and space != 1 and comma != 2:
+        t = 9
+    if t == 2 and x[:2] == "lw" and space != 1 and comma != 1 and leftbrac != 1 and rightbrac != 1:
+        t = 9.5
+    if t == 3 and space != 1 and comma != 1 and leftbrac != 1 and rightbrac != 1:
+        t = 10
+    if t == 4 and space != 1 and comma != 2:
+        t = 11
+    if t == 5 and space != 1 and comma != 1:
+        t = 12
+    if t == 6 and space != 1 and comma!= 1:
+        t = 13
+    if t not in (8,9,9.5,10,11,12,13):
+        t = 0
+    return t
 #binary encoding for registers
 registers = {'x0':'00000',
              'x1':'00001',
