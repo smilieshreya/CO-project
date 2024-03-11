@@ -348,4 +348,82 @@ temp_binary_list = [
 "lui"
 ]
 
+R = 1
+I = 2
+S = 3
+B = 4
+U = 5
+J = 6
 
+
+pointer = open("C:\\Users\\omen6\\OneDrive\\Desktop\\input_file.txt","r")
+w_pointer = open("C:\\Users\\omen6\\OneDrive\\Desktop\\output_file.txt","w")
+s = pointer.readlines()
+print(len(s))
+pointer.seek(0)
+L = [] #list to store functions
+L1 = []
+LD = {} #dictionaries to hold labels
+for i in range(0,len(s)):
+    j = pointer.readline()
+    u = j.replace('\n','')
+    u = u.rstrip("\n")
+    k = u.split(",")
+    l = k[0].split(' ')
+    del k[0]
+    L = l+k
+    if ":" in L[0]:
+        L[0] = L[0].replace(":","")
+        LD[L[0]] = i*4
+        del L[0]
+print(LD)
+
+pointer.seek(0)
+
+for i in range(0,len(s)):
+    j = pointer.readline()
+    u = j.replace('\n','')
+    u = u.rstrip("\n")
+    if "(" and ")" in u:
+        u = u.replace("(",",")
+        u = u.replace(")","")
+    #print(u)
+    k = u.split(",")
+    l = k[0].split(' ')
+    del k[0]
+    L = l+k
+    if ":" in L[0]:
+        L[0] = L[0].replace(":","")
+        LD[L[0]] = i*4
+        del L[0]
+    for b in L:
+        if len(b)==0:
+            continue
+        else:
+            L1.append(b)
+    print(L1)
+    n = instruc_type(L1[0])
+    print(j)
+    w0 = error_check(j,n)
+    print(w0)
+    if w0 == 0:
+        n = instruc_type(L1[0])
+        w1 = instruc_structure(L1,n,i)
+        print(w1)
+        if "Synatx" in w1 or "Range" in w1:
+            #w_pointer.seek(0)
+            #w_pointer.truncate()
+            w_pointer.write(w1)
+            #break
+        w_pointer.write(w1)
+    else:
+        #w_pointer.seek(0)
+        #w_pointer.truncate()
+        w1 = instruc_structure(L1,w0,i)
+        w_pointer.write(w1)
+        #break
+    L1 = []
+    L = []
+
+pointer.close()
+w_pointer.close()
