@@ -451,6 +451,10 @@ for i in range(0,len(s)):
         w1 = instruc_structure(L1,w0,i)
         w_pointer.write(w1)
         break
+    if i == len(s)-1 and w1 != "00000000000000000000000001100011":
+        w_pointer.seek(0)
+        w_pointer.truncate()
+        w_pointer.write("Error:Virtual Halt not being used in the last line")    
     L1 = []
     L = []
 
