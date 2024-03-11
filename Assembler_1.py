@@ -1,4 +1,5 @@
 #code to make an assembler
+
 def bitbinary20(decimal):
     """ function to convert decimal to binary in 20 bits"""
     if decimal < -524288 or decimal > 524287:
@@ -7,9 +8,7 @@ def bitbinary20(decimal):
         binary = bin(decimal)[2:].zfill(20)
     else:
         binary = bin(2**20 + decimal)[2:]
-
     return binary
-
 
 def bitbinary12(decimal):
     """ function to convert decimal to binary in 12 bits"""
@@ -41,7 +40,7 @@ def instruc_type(x):
         type_= 7     
     return type_
     
-def instruc_structure(L,t,f):
+    def instruc_structure(L,t,f):
     '''function to output binaries according to the risc v isa structure. Input is a list L which 
        contains all the instructions as a seperate element and variable t denoting basically the instruction type '''
     #for R type
@@ -169,7 +168,7 @@ def instruc_structure(L,t,f):
         return z
     if t == 8 or t == 9 or t == 11 or t == 12 or t==13:
         z = 'Syntax Error (missing a "," or blankspace in the instruction) at line number '+str(i)+'\n'
-        print(type(z))
+        #print(type(z))
         return z
     if t == 9.5 or t == 10:
         z = 'Syntax Error (missing a "," or blankspace or () in the instruction) at line number '+str(i)+'\n'
@@ -180,6 +179,8 @@ def instruc_structure(L,t,f):
     if t == 15:
         z = 'ValueError: Value of immediate out of range at line number '+str(i)+'\n'
         return z
+
+#to check errors
 def error_check(x,t):
     space = 0
     comma = 0
@@ -212,6 +213,8 @@ def error_check(x,t):
     if t not in (8,9,9.5,10,11,12,13):
         t = 0
     return t
+
+
 #binary encoding for registers
 registers = {'x0':'00000',
              'x1':'00001',
@@ -380,18 +383,11 @@ temp_binary_list = [
 "lui"
 ]
 
-R = 1
-I = 2
-S = 3
-B = 4
-U = 5
-J = 6
 
-
-pointer = open("C:\\Users\\omen6\\OneDrive\\Desktop\\input_file.txt","r")
-w_pointer = open("C:\\Users\\omen6\\OneDrive\\Desktop\\output_file.txt","w")
+pointer = open("<file path>","r")
+w_pointer = open("<file path>","w")
 s = pointer.readlines()
-print(len(s))
+#print(len(s))
 pointer.seek(0)
 L = [] #list to store functions
 L1 = []
@@ -408,7 +404,7 @@ for i in range(0,len(s)):
         L[0] = L[0].replace(":","")
         LD[L[0]] = i*4
         del L[0]
-print(LD)
+#print(LD)
 
 pointer.seek(0)
 
@@ -433,15 +429,15 @@ for i in range(0,len(s)):
             continue
         else:
             L1.append(b)
-    print(L1)
+    #print(L1)
     n = instruc_type(L1[0])
     print(j)
     w0 = error_check(j,n)
-    print(w0)
+    #print(w0)
     if w0 == 0:
         n = instruc_type(L1[0])
         w1 = instruc_structure(L1,n,i)
-        print(w1)
+        #print(w1)
         if "Synatx" in w1 or "Range" in w1:
             #w_pointer.seek(0)
             #w_pointer.truncate()
@@ -457,5 +453,6 @@ for i in range(0,len(s)):
     L1 = []
     L = []
 
+print("Completed")
 pointer.close()
 w_pointer.close()
