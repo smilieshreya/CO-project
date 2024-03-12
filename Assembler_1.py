@@ -382,10 +382,11 @@ temp_binary_list = [
 "bgeu"
 "lui"
 ]
+in_ = input("Enter the Input File Path: ")
+out = input("Enter the Output File Path")
 
-
-pointer = open("<file path>","r")
-w_pointer = open("<file path>","w")
+pointer = open(in_,"r")
+w_pointer = open(out,"w")
 s = pointer.readlines()
 #print(len(s))
 pointer.seek(0)
