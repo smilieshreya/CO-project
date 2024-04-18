@@ -469,6 +469,7 @@ for i in range(0,len(s)):
     n = instruc_type(L1[0])
     #print(j)
     w0 = error_check(j,n)
+    w0 = 0
     #print(w0)
     if w0 == 0:
         n = instruc_type(L1[0])
