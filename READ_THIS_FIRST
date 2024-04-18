@@ -3,3 +3,5 @@
 --> Both the Assembler File contain the same code for the RiscV Assembler 
 
 --> Simulator.py contains the code file for RiscV Simulator
+
+---> FOR AUTOMATED TESTING PLEASE CHANGE THE r_pointer and w_pointer IN LINE 552 and 553 TO WHATEVER IS REQUIRED FOR SIMULATOR
