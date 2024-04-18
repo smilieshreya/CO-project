@@ -182,7 +182,7 @@ def instruc_structure(L,t,f):
                 #print(z)
                 return z
             elif L[1] in abi_registers:
-                z =  a[0]+a[1]+a[10:19]+a[9]+a[0:8]+abi_registers[L[1]]+j_opcodes[L[0]]+"\n"
+                z =  a[0]+a[9]+a[10:19]+a[9]+a[0:8]+abi_registers[L[1]]+j_opcodes[L[0]]+"\n"
                 #print(z)
                 return z
             else:
