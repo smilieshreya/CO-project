@@ -143,7 +143,7 @@ def _execute(types,b):
             abi_registers_value[str(zz3)] = decimal_to_binary((bin_to_dec((abi_registers_value[zz1][2::]))) ^ bin_to_dec((abi_registers_value[oper2][2::])))
             program_counter['pc'] = decimal_to_binary(bin_to_dec(program_counter['pc'])+4)
         elif oper == "srl":
-            abi_registers_value[str(zz3)] = decimal_to_binary(binary_to_Udecimal((str(abi_registers_value[zz1][2::]))) >> binary_to_Udecimal(str(abi_registers_value[oper2][2::][27::])))
+            abi_registers_value[str(zz3)] = decimal_to_binary(binary_to_Udecimal((str(abi_registers_value[zz1][2::]))) >> (binary_to_Udecimal(str(abi_registers_value[oper2][2::][27::]))))
             program_counter['pc'] = decimal_to_binary(bin_to_dec(program_counter['pc'])+4)
         elif oper == "or":
             abi_registers_value[str(zz3)] = decimal_to_binary(bin_to_dec((abi_registers_value[zz1][2::])) | bin_to_dec((abi_registers_value[oper2][2::])))
@@ -224,13 +224,13 @@ def _execute(types,b):
                 program_counter['pc'] = decimal_to_binary(bin_to_dec(program_counter['pc'])+4)
         
         elif oper=="bge":
-            if bin_to_dec(abi_registers_value[z5]) > bin_to_dec(abi_registers_value[z6]):
+            if bin_to_dec(abi_registers_value[z5]) >= bin_to_dec(abi_registers_value[z6]):
                 program_counter['pc'] =  decimal_to_binary(bin_to_dec(program_counter['pc'])+bin_to_dec(imm[2::]))
             else:
                 program_counter['pc'] = decimal_to_binary(bin_to_dec(program_counter['pc'])+4)
 
         elif oper=="bgeu":
-            if bin_to_dec(abi_registers_value[z5]) > bin_to_dec(abi_registers_value[z6]):
+            if bin_to_dec(abi_registers_value[z5]) >= bin_to_dec(abi_registers_value[z6]):
                 program_counter['pc'] =  decimal_to_binary(int(program_counter['pc'],2)+int(imm,2))
             else:
                 program_counter['pc'] = decimal_to_binary(bin_to_dec(program_counter['pc'])+4)
@@ -242,7 +242,7 @@ def _execute(types,b):
                 program_counter['pc'] = decimal_to_binary(bin_to_dec(program_counter['pc'])+4)
 
         elif oper=="bltu":
-            if bin_to_dec(abi_registers_value[z5]) < bin_to_dec(abi_registers_value[z6]):
+            if binary_to_Udecimal(abi_registers_value[z5]) < binary_to_Udecimal(abi_registers_value[z6]):
                 program_counter['pc'] =  decimal_to_binary(int(program_counter['pc'],2)+int(imm,2))
             else:
                 program_counter['pc'] = decimal_to_binary(bin_to_dec(program_counter['pc'])+4)
