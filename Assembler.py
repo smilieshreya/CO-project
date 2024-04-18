@@ -1,5 +1,16 @@
 #code to implement an assembler using python that prints only errors in the file if there is any error or more than one error
 import os
+import sys
+def bitbinary32(decimal):
+    """ function to convert decimal to binary in 32 bits"""
+    if decimal < -2147483648 or decimal > 2147483647:
+        binary = 'Error: Value of Immediate Out of Range'
+    elif decimal >= 0:
+        binary = bin(decimal)[2:].zfill(32)
+    else:
+        binary = bin(2**32 + decimal)[2:]
+
+    return binary
 
 def bitbinary20(decimal):
     """ function to convert decimal to binary in 20 bits"""
@@ -40,7 +51,7 @@ def instruc_type(x):
     elif x in j_opcodes:
         type_ = 6
     elif x not in r_opcodes or i_opcodes or s_opcodes or b_opcodes or u_opcodes or j_opcodes:
-        type_= 7     
+        type_= 7  
     return type_
 
 def instruc_structure(L,t,f):
@@ -72,9 +83,9 @@ def instruc_structure(L,t,f):
                     #print(z)
                     return z
                 else:
-                    t = 14   
+                    t = 14
             else:
-                t = 15       
+                t = 15 
         else:
             a = bitbinary12(int(L[3]))
             if "Range" not in a:
@@ -97,7 +108,7 @@ def instruc_structure(L,t,f):
         a = bitbinary12(int(L[2]))
         if "Error" not in a:
             if L[1] and L[3] in registers:
-                z = a[0:7]+registers[L[1]]+registers[L[3]]+s_func3[L[0]]+a[7::]+s_opcodes[L[0]]+"\n"
+                z = a[0:8]+registers[L[1]]+registers[L[3]]+s_func3[L[0]]+a[8::]+s_opcodes[L[0]]+"\n"
                 #print(z)
                 return z
             elif L[1] and L[3] in abi_registers:
@@ -112,19 +123,24 @@ def instruc_structure(L,t,f):
     #for B type
     #L = ["function","register","register","imm"]
     if t==4:
+        #print(L[3].lstrip("-"))
         #to handle Labels
-        if L[3].isnumeric():              
+        if L[3].lstrip("-").isdigit():
             a = bitbinary12(int(L[3]))
         else:
-            L[3] = 4*i-(LD[L[3]])
-            a = bitbinary12((L[3]))
+            if L[3] in LD:
+                L[3] = (LD[L[3]])-4*i
+                a = bitbinary12((L[3]))
+            else:
+                z = "Error: Undefined Label was called "+str(i+1)+"\n"
+                return z
         if "Error" not in a:
             if L[1] and L[2] in registers:
                 z = a[0]+a[2:8]+registers[L[2]]+registers[L[1]]+b_func3[L[0]]+a[8:12]+a[1]+b_opcodes[L[0]]+"\n"
                 #print(z)
                 return z
             elif L[1] and L[2] in abi_registers:
-                z = a[0]+a[2:8]+abi_registers[L[2]]+abi_registers[L[1]]+b_func3[L[0]]+a[1]+a[8:12]+b_opcodes[L[0]]+"\n"
+                z = a[0]+a[1:7]+abi_registers[L[2]]+abi_registers[L[1]]+b_func3[L[0]]+a[7:11]+a[1]+b_opcodes[L[0]]+"\n"
                 #print(z)
                 return z
             else:
@@ -134,14 +150,14 @@ def instruc_structure(L,t,f):
     #for U Type
     #L = ["func","register","imm"]
     if t==5:
-        a = bitbinary20(int(L[2]))
+        a = bitbinary32(int(L[2]))
         if "Error" not in a:
             if L[1] in registers:
-                z = a+registers[L[1]]+u_opcodes[L[0]]+"\n"
+                z = a[0:20]+registers[L[1]]+u_opcodes[L[0]]+"\n"
                 #print(z)
                 return z
             elif L[1] in abi_registers:
-                z = a+abi_registers[L[1]]+u_opcodes[L[0]]+"\n"
+                z = a[0:20]+abi_registers[L[1]]+u_opcodes[L[0]]+"\n"
                 #print(z)
                 return z
             else:
@@ -151,14 +167,22 @@ def instruc_structure(L,t,f):
     #for J type
     #L = ["func","register","imm"]
     if t == 6:
-        a = bitbinary20(int(L[2]))
+        if L[2].lstrip("-").isdigit():
+            a = bitbinary20(int(L[2]))
+        else:
+            if L[2] in LD:
+                L[2] = (LD[L[2]])-4*i
+                a = bitbinary20(int(L[2]))
+            else:
+                z = "Error: Undefined Label was called at line "+str(i+1)+"\n"
+                return z
         if "Error" not in a:
             if L[1] in registers:
-                z =  a[0]+a[0]+a[10:10]+a[9]+a[1:9]+registers[L[1]]+j_opcodes[L[0]]+"\n"
+                z =  a[0]+a[1]+a[10:19]+a[9]+a[1:9]+registers[L[1]]+j_opcodes[L[0]]+"\n"
                 #print(z)
                 return z
             elif L[1] in abi_registers:
-                z =  a[0]+a[0]+a[10:19]+a[9]+a[1:9]+abi_registers[L[1]]+j_opcodes[L[0]]+"\n"
+                z =  a[0]+a[1]+a[10:19]+a[9]+a[0:8]+abi_registers[L[1]]+j_opcodes[L[0]]+"\n"
                 #print(z)
                 return z
             else:
@@ -166,21 +190,21 @@ def instruc_structure(L,t,f):
         else:
             t = 15
     if t == 7:
-        z = "Error:Illegal Instruction"+'\n'
+        z = "Error:Illegal Instruction at line "+str(i+1)+'\n'
         #print(z)
         return z
     if t == 8 or t == 9 or t == 11 or t == 12 or t==13:
-        z = 'Syntax Error (missing a "," or blankspace in the instruction) at line number '+str(i)+'\n'
-        print(type(z))
+        z = 'Syntax Error (missing a "," or blankspace in the instruction) at line number '+str(i+1)+'\n'
+        #print(type(z))
         return z
     if t == 9.5 or t == 10:
-        z = 'Syntax Error (missing a "," or blankspace or () in the instruction) at line number '+str(i)+'\n'
+        z = 'Syntax Error (missing a "," or blankspace or () in the instruction) at line number '+str(i+1)+'\n'
         return z
     if t == 14:
-        z = 'Synatx Error (Register Name Invalid) at line number '+str(i)+'\n'
+        z = 'Synatx Error (Register Name Invalid) at line number '+str(i+1)+'\n'
         return z
     if t == 15:
-        z = 'ValueError: Value of immediate out of range at line number '+str(i)+'\n'
+        z = 'ValueError: Value of immediate out of range at line number '+str(i+1)+'\n'
         return z
     
 def error_check(x,t):
@@ -357,7 +381,7 @@ b_func3 = {"beq":"000",
 u_opcodes = {"lui":"0110111","auipc":"0010111"}
 
 #for J Type Instruction
-j_opcodes = {"jal":"1101111","jalr":"1110011"}
+j_opcodes = {"jal":"1101111"}
 
 #to check if the function exists in the isa
 temp_binary_list = [
@@ -382,13 +406,15 @@ temp_binary_list = [
 "bltu"
 "bgeu"
 "lui"
-] 
+]
 
-in_ = input("Enter the Input File Path: ")
-out = input("Enter the Output File Path")
+# assembly_file = input()
+# machine_code_file = input()
 
-pointer = open(in_,"r")
-w_pointer = open(out,"w")
+pointer = open(sys.argv[1],"r")
+w_pointer = open(sys.argv[2],"w")
+# pointer = assembly_file
+# w_pointer = machine_code_file
 s = pointer.readlines()
 #print(len(s))
 pointer.seek(0)
@@ -427,6 +453,13 @@ for i in range(0,len(s)):
         L[0] = L[0].replace(":","")
         LD[L[0]] = i*4
         del L[0]
+    # else:
+    #     z = "Syntax Error: unrequired space between label name and ':' at line "+str(i+1)
+    #     w_pointer.seek(0)
+    #     w_pointer.truncate()
+    #     w_pointer.write(z)
+    #     break
+
     for b in L:
         if len(b)==0:
             continue
@@ -439,14 +472,16 @@ for i in range(0,len(s)):
     #print(w0)
     if w0 == 0:
         n = instruc_type(L1[0])
+
         w1 = instruc_structure(L1,n,i)
         #print(w1)
-        if "Synatx" in w1 or "Value" in w1:
+        if "Synatx" in w1 or "Value" in w1 or "Label" in w1:
             w_pointer.seek(0)
             w_pointer.truncate()
             w_pointer.write(w1)
             break
-        w_pointer.write(w1)
+        else:
+            w_pointer.write(w1)
     else:
         w_pointer.seek(0)
         w_pointer.truncate()
@@ -456,7 +491,7 @@ for i in range(0,len(s)):
     if i == len(s) and w1 != "00000000000000000000000001100011":
         w_pointer.seek(0)
         w_pointer.truncate()
-        w_pointer.write("Error:Virtual Halt not being used in the last line")    
+        w_pointer.write("Error:Virtual Halt not being used in the last line")
     L1 = []
     L = []
 
